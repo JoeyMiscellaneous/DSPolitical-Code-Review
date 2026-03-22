@@ -1,39 +1,31 @@
 {
   "name": "frontend",
   "private": true,
-  "type": "module",
   "version": "0.0.0",
+  "type": "module",
   "scripts": {
-    "dev": "vite --host",
-    "build": "run-p type-check \"build-only {@}\" --",
-    "preview": "vite preview",
-    "build-only": "vite build",
-    "type-check": "vue-tsc --build --force",
-    "lint": "eslint . --fix"
+    "dev": "vite --host 0.0.0.0",
+    "build": "tsc -b && vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
   },
   "dependencies": {
-    "@fontsource/roboto": "5.2.5",
-    "@mdi/font": "7.4.47",
-    "axios": "^1.9.0",
-    "vue": "^3.5.13",
-    "vuetify": "^3.8.1"
+    "axios": "^1.13.6",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4"
   },
   "devDependencies": {
-    "@tsconfig/node22": "^22.0.0",
-    "@types/node": "^22.9.0",
-    "@vitejs/plugin-vue": "^5.2.3",
-    "@vue/tsconfig": "^0.7.0",
-    "eslint": "^9.23.0",
-    "eslint-config-vuetify": "^3.0.3",
-    "npm-run-all2": "^7.0.2",
-    "sass-embedded": "^1.86.3",
-    "typescript": "~5.8.2",
-    "unplugin-fonts": "^1.3.1",
-    "unplugin-vue-components": "^28.4.1",
-    "unplugin-vue-router": "^0.12.0",
-    "vite": "^6.2.2",
-    "vite-plugin-vuetify": "^2.1.1",
-    "vue-router": "^4.5.0",
-    "vue-tsc": "^2.2.8"
+    "@eslint/js": "^9.39.4",
+    "@types/node": "^24.12.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.1",
+    "eslint": "^9.39.4",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.5.2",
+    "globals": "^17.4.0",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.57.0",
+    "vite": "^8.0.1"
   }
 }
