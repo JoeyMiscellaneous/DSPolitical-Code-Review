@@ -1,33 +1,55 @@
-import { CircularProgress, TextField } from "@mui/material";
-import { skipToken, useQuery } from "@tanstack/react-query";
-import axios from "axios";
+import {
+  Button,
+  CircularProgress,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  TextField,
+} from "@mui/material";
 import { useParams } from "react-router";
-
-const getStationNextTrains = async (stationCode: string) => {
-  return await axios
-    .get(
-      import.meta.env.VITE_BACKEND_URL +
-        "/get-station-next-trains/" +
-        stationCode,
-    )
-    .then((res) => res)
-    .catch((err) => {
-      console.error(err);
-      return null;
-    });
-};
+import { getStationNextTrainsQuery } from "../hooks/getStationNextTrains";
 
 export const StationTimes = () => {
   const { stationCode } = useParams();
 
-  const { data, error, isLoading } = useQuery({
-    queryKey: ["stationNextTrains", stationCode],
-    queryFn: stationCode ? () => getStationNextTrains(stationCode) : skipToken,
-  });
+  const {
+    data: stationNextTrains,
+    isLoading,
+    error,
+    refetch,
+  } = getStationNextTrainsQuery(stationCode);
 
-  if (data) console.log(data);
+  if (stationNextTrains) console.log(stationNextTrains);
   if (isLoading) return <CircularProgress />;
   if (error) return <TextField disabled />;
 
-  return <>stationCode</>;
+  return (
+    <>
+      <Button onClick={() => refetch()}>Refresh arrival times</Button>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>Car</TableCell>
+            <TableCell>Destination</TableCell>
+            <TableCell>Min</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {stationNextTrains
+            ?.sort((a, b) => a.DestinationName.localeCompare(b.DestinationName))
+            .map((snt, idx) => {
+              return (
+                <TableRow key={idx}>
+                  <TableCell>{snt.Car}</TableCell>
+                  <TableCell>{snt.DestinationName}</TableCell>
+                  <TableCell>{snt.Min ? snt.Min : "N/A"}</TableCell>
+                </TableRow>
+              );
+            })}
+        </TableBody>
+      </Table>
+    </>
+  );
 };
