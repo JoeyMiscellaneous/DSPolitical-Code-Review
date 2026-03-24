@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use Psr\Log\LoggerInterface;
+use App\Service\RailServiceInterface;
 use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 use Symfony\Component\HttpKernel\Log\Logger;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -11,7 +12,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 use App\Dto\RailServiceDtos\StationDtos\StationArrayDto;
 use App\Dto\RailServiceDtos\TrainDtos\TrainArrayDto;
 
-class RailService
+class RailService implements RailServiceInterface
 {
     private Logger $logger;
     private HttpClientInterface $client;

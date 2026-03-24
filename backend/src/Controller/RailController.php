@@ -2,23 +2,22 @@
 
 namespace App\Controller;
 
-use App\Service\RailService;
+use App\Service\RailServiceInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[AsController]
 class RailController
 {
     #[Route('/get-stations')]
-    public function getStations(RailService $service, LoggerInterface $logger) : Response
+    public function getStations(RailServiceInterface $railService, LoggerInterface $logger) : Response
     {
         try {
-            $stations = $service->getStations();
+            $stations = $railService->getStations();
             return new JsonResponse($stations->stations);
         } catch (TooManyRequestsHttpException $e) {
             return new JsonResponse(['message' => 'Too many requests'], 429);
@@ -28,10 +27,10 @@ class RailController
     }
 
     #[Route('/get-station-next-trains/{stationCode}')]
-    public function getStationNextTrains(string $stationCode, RailService $service, LoggerInterface $logger) : Response
+    public function getStationNextTrains(string $stationCode, RailServiceInterface $railService, LoggerInterface $logger) : Response
     {
         try {
-            $nextTrains = $service->getStationNextTrains($stationCode);
+            $nextTrains = $railService->getStationNextTrains($stationCode);
             return new JsonResponse($nextTrains->trains);
         } catch (TooManyRequestsHttpException $e) {
             return new JsonResponse(['message' => 'Too many requests'], 429);
