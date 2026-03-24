@@ -1,18 +1,21 @@
 import {
   Button,
   CircularProgress,
+  Stack,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableRow,
-  TextField,
+  Typography,
 } from "@mui/material";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { getStationNextTrainsQuery } from "../hooks/getStationNextTrains";
+import type { SymfonyError } from "./ErrorPage";
 
 export const StationTimes = () => {
   const { stationCode } = useParams();
+  const navigate = useNavigate();
 
   const {
     data: stationNextTrains,
@@ -21,35 +24,42 @@ export const StationTimes = () => {
     refetch,
   } = getStationNextTrainsQuery(stationCode);
 
-  if (stationNextTrains) console.log(stationNextTrains);
-  if (isLoading) return <CircularProgress />;
-  if (error) return <TextField disabled />;
+  if (error) {
+    const errorData = error?.response?.data as SymfonyError;
+    navigate("/error?errorMessage=" + errorData?.message);
+  }
+  if (isLoading) return <CircularProgress sx={{ alignSelf: "center" }} />;
 
   return (
-    <>
+    <Stack alignItems="center">
       <Button onClick={() => refetch()}>Refresh arrival times</Button>
+      <Typography variant="subtitle2">
+        Note: Arrival times refresh every 5 seconds by default
+      </Typography>
       <Table>
         <TableHead>
           <TableRow>
             <TableCell>Car</TableCell>
+            <TableCell>Line</TableCell>
             <TableCell>Destination</TableCell>
             <TableCell>Min</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {stationNextTrains
-            ?.sort((a, b) => a.DestinationName.localeCompare(b.DestinationName))
+            ?.sort((a, b) => a.destinationName.localeCompare(b.destinationName))
             .map((snt, idx) => {
               return (
                 <TableRow key={idx}>
-                  <TableCell>{snt.Car}</TableCell>
-                  <TableCell>{snt.DestinationName}</TableCell>
-                  <TableCell>{snt.Min ? snt.Min : "N/A"}</TableCell>
+                  <TableCell>{snt.car}</TableCell>
+                  <TableCell>{snt.line}</TableCell>
+                  <TableCell>{snt.destinationName}</TableCell>
+                  <TableCell>{snt.min ? snt.min : "N/A"}</TableCell>
                 </TableRow>
               );
             })}
         </TableBody>
       </Table>
-    </>
+    </Stack>
   );
 };

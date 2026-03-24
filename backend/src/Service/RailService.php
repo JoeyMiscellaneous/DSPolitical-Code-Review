@@ -3,29 +3,43 @@
 namespace App\Service;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 use Symfony\Component\HttpKernel\Log\Logger;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Component\Serializer\SerializerInterface;
+use App\Dto\RailServiceDtos\StationDtos\StationArrayDto;
+use App\Dto\RailServiceDtos\TrainDtos\TrainArrayDto;
 
 class RailService
 {
     private Logger $logger;
     private HttpClientInterface $client;
+    private SerializerInterface $serializer;
+    private ValidatorInterface $validator;
     private string $wmataApiKey;
     private string $wmataUrl;
 
     public function __construct(
         LoggerInterface $logger,
         HttpClientInterface $client,
+        SerializerInterface $serializer,
+        ValidatorInterface $validator,
         string $wmataApiKey,
         string $wmataUrl
     ) {
         $this->logger = $logger;
         $this->client = $client;
+        $this->serializer = $serializer;
+        $this->validator = $validator;
         $this->wmataApiKey = $wmataApiKey;
         $this->wmataUrl = $wmataUrl;
     }
 
-    public function getStations(): array
+    /**
+     * @return StationArrayDto An array of stations
+     */
+    public function getStations(): StationArrayDto
     {
         $response = $this->client->request(
             'GET',
@@ -37,14 +51,29 @@ class RailService
         );
 
         $statusCode = $response->getStatusCode();
-        $contentType = $response->getHeaders()['content-type'][0];
-        $content = $response->getContent();
-        $content = $response->toArray();
+        if ($statusCode == 429) {
+            throw new TooManyRequestsHttpException();
+        }
 
-        return $content;
+        $stations = $response->getContent();
+
+        $dto = $this->serializer->deserialize($stations, StationArrayDto::class, 'json');
+
+        $errors = $this->validator->validate($dto);
+
+        if (count($errors) > 0) {
+            $errorsString = (string) $errors;
+            $this->logger->error('WMATA API sent invalid station data', ['errors' => $errorsString]);
+            throw new \RuntimeException('WMATA API sent invalid station data');
+        }
+
+        return $dto; 
     }
 
-    public function getStationNextTrains(string $stationCode): array
+    /**
+     * @return TrainArrayDto An array of trains
+     */
+    public function getStationNextTrains(string $stationCode): TrainArrayDto
     {
         $response = $this->client->request(
             'GET',
@@ -56,10 +85,22 @@ class RailService
         );
 
         $statusCode = $response->getStatusCode();
-        $contentType = $response->getHeaders()['content-type'][0];
-        $content = $response->getContent();
-        $content = $response->toArray();
+        if ($statusCode == 429) {
+            throw new TooManyRequestsHttpException();
+        }
 
-        return $content;
+        $trains = $response->getContent();
+
+        $dto = $this->serializer->deserialize($trains, TrainArrayDto::class, 'json');
+
+        $errors = $this->validator->validate($dto);
+
+        if (count($errors) > 0) {
+            $errorsString = (string) $errors;
+            $this->logger->error('WMATA API sent invalid station next train data', ['errors' => $errorsString]);
+            throw new \RuntimeException('WMATA API sent invalid station next train data');
+        }
+
+        return $dto;
     }
 }

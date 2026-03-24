@@ -1,33 +1,30 @@
 import { useQuery, skipToken } from "@tanstack/react-query";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 
 interface Train {
-  Car: number;
-  DestinationCode: string;
-  DestinationName: string;
-  Group: number;
-  LocationCode: string;
-  LocationName: string;
-  Min: number;
+  destinationName: string;
+  min: string;
+  line: string;
+  car: string;
 }
 
 const getStationNextTrains = async (stationCode: string) => {
   return await axios
-    .get(
+    .get<Train[]>(
       import.meta.env.VITE_BACKEND_URL +
         "/get-station-next-trains/" +
         stationCode,
     )
-    .then((res): Train[] => res?.data["Trains"])
-    .catch((err) => {
-      console.error(err);
-      return null;
-    });
+    .then((res) => res.data)
+    .catch((err) => Promise.reject(err));
 };
 
 export const getStationNextTrainsQuery = (stationCode: string | undefined) =>
-  useQuery({
+  useQuery<Train[], AxiosError>({
     queryKey: ["stationNextTrains", stationCode],
     queryFn: stationCode ? () => getStationNextTrains(stationCode) : skipToken,
     staleTime: 0, // e.g. Query completes the microsecond before the times update
+    retry: false,
+    refetchInterval: 5000, // Refetch every 5 seconds
+    refetchIntervalInBackground: false, // Don't refetch if not viewing that tab
   });

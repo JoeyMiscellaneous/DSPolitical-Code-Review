@@ -1,19 +1,20 @@
 import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 
 interface Station {
-  Code: string;
-  Name: string;
+  code: string;
+  name: string;
 }
 
 const getStations = async () => {
   return await axios
-    .get(import.meta.env.VITE_BACKEND_URL + "/get-stations")
-    .then((res): Station[] => res?.data["Stations"])
-    .catch((err) => {
-      console.error(err);
-    });
+    .get<Station[]>(import.meta.env.VITE_BACKEND_URL + "/get-stations")
+    .then((res) => res.data);
 };
 
 export const getStationsQuery = () =>
-  useQuery({ queryKey: ["stations"], queryFn: getStations });
+  useQuery<Station[], AxiosError>({
+    queryKey: ["stations"],
+    queryFn: getStations,
+    retry: false,
+  });
