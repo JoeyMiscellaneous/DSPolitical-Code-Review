@@ -37,11 +37,16 @@ class RailService implements RailServiceInterface
         $this->wmataUrl = $wmataUrl;
     }
 
+    // https://symfony.com/doc/current/rate_limiter.html 
+    // TODO: Inject rate limiter in params, 
+
     /**
      * @return StationArrayDto An array of stations
      */
     public function getStations(): StationArrayDto
     {
+        // TODO: Limit usage based on IP address. I like the idea of using `wait();`, and then putting a spinner or some indication of a query moving slowly on the front end for queries that are taking a while
+
         $response = $this->client->request(
             'GET',
             $this->wmataUrl . '/Rail.svc/json/jStations', [
@@ -65,7 +70,7 @@ class RailService implements RailServiceInterface
         if (count($errors) > 0) {
             $errorsString = (string) $errors;
             $this->logger->error('WMATA API sent invalid station data', ['errors' => $errorsString]);
-            throw new \RuntimeException('WMATA API sent invalid station data');
+            throw new \RuntimeException();
         }
 
         return $dto; 
@@ -76,6 +81,8 @@ class RailService implements RailServiceInterface
      */
     public function getStationNextTrains(string $stationCode): TrainArrayDto
     {
+        // TODO: Limit usage based on IP address. I like the idea of using `wait();`, and then putting a spinner or some indication of a query moving slowly on the front end for queries that are taking a while
+
         $response = $this->client->request(
             'GET',
             $this->wmataUrl . '/StationPrediction.svc/json/GetPrediction/' . $stationCode, [
@@ -99,7 +106,7 @@ class RailService implements RailServiceInterface
         if (count($errors) > 0) {
             $errorsString = (string) $errors;
             $this->logger->error('WMATA API sent invalid station next train data', ['errors' => $errorsString]);
-            throw new \RuntimeException('WMATA API sent invalid station next train data');
+            throw new \RuntimeException();
         }
 
         return $dto;

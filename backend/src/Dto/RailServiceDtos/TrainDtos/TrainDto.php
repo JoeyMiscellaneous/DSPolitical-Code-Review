@@ -16,16 +16,16 @@ class TrainDto
 	public string $line;
 
 	#[SerializedName('Min')]
-	public string $min;
+	public ?string $min;
 
 	#[SerializedName('Car')]
-	public string $car;
+	public ?string $car;
 
 	/** @param string $destinationName */
 	/** @param string $min */
 	/** @param string $line */
 	/** @param string $car */
-	public function __construct(string $destinationName, string $line, string $min, string $car) {
+	public function __construct(string $destinationName, string $line, ?string $min, ?string $car) {
 		$this->destinationName = $destinationName;
 		$this->line = $line; 
 		$this->min = $min; 

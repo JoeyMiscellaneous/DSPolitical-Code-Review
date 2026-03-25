@@ -22,7 +22,7 @@ class RailController
         } catch (TooManyRequestsHttpException $e) {
             return new JsonResponse(['message' => 'Too many requests'], 429);
         } catch (\RuntimeException $e) {
-            return new JsonResponse(['message' => 'WMATA error'], 429);
+            return new JsonResponse(['message' => 'WMATA error'], 502);
         }
     }
 
@@ -35,7 +35,7 @@ class RailController
         } catch (TooManyRequestsHttpException $e) {
             return new JsonResponse(['message' => 'Too many requests'], 429);
         } catch (\RuntimeException $e) {
-            return new JsonResponse(['message' => 'WMATA error'], 429);
+            return new JsonResponse(['message' => 'WMATA error'], 502);
         }
     }
 }

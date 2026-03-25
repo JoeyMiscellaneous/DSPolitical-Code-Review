@@ -29,6 +29,7 @@ export const StationPicker = () => {
   if (error) {
     const errorData = error?.response?.data as SymfonyError;
     navigate("/error?errorMessage=" + errorData?.message);
+    return <></>;
   }
 
   if (isLoading) return <CircularProgress sx={{ alignSelf: "center" }} />;
@@ -39,7 +40,7 @@ export const StationPicker = () => {
         {currentStation ? (
           <Typography variant="h5">{currentStation.name}</Typography>
         ) : (
-          <Typography variant="h5">Station Times</Typography>
+          <Typography variant="h5">Stations</Typography>
         )}
       </Stack>
       <Autocomplete

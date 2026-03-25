@@ -27,7 +27,9 @@ export const StationTimes = () => {
   if (error) {
     const errorData = error?.response?.data as SymfonyError;
     navigate("/error?errorMessage=" + errorData?.message);
+    return <></>;
   }
+
   if (isLoading) return <CircularProgress sx={{ alignSelf: "center" }} />;
 
   return (
